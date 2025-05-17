@@ -6,6 +6,10 @@ import Image from "next/image";
 import { Button } from "./ui/button";
 // import { avatarImages } from "@/constants";
 import { useToast } from "./ui/use-toast";
+import { Darumadrop_One } from "next/font/google";
+import { useState } from "react";
+import SummaryPopover from "./SummaryPopover";
+import Loader from "./Loader";
 
 interface MeetingCardProps {
   title: string;
@@ -20,7 +24,8 @@ interface MeetingCardProps {
   creator: any;
   isRecording?: boolean,
   durationRecording?: string,
-  isUpcoming?: boolean
+  isUpcoming?: boolean,
+  setGPTLoader: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const MeetingCard = ({
@@ -36,10 +41,35 @@ const MeetingCard = ({
   creator,
   isRecording,
   durationRecording,
-  isUpcoming
+  isUpcoming,
+  setGPTLoader
 }: MeetingCardProps) => {
   const { toast } = useToast();
   console.log(creator)
+
+  console.log(link);
+
+  const [summary, setSummary] = useState<string>("")
+
+  async function getSummary(videoUrl: string) {
+    setGPTLoader(true)
+    const res = await fetch("http://localhost:8000/process_summary", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ video_url: videoUrl }),
+    })
+    const data = await res.json()
+    if (data.response) {
+      setSummary(data.response) // This will trigger the popover in SummaryPopover
+      setGPTLoader(false)
+    }else{
+      setGPTLoader(false)
+    }
+  }
+
+
   return (
     <section className="flex min-h-[258px] w-full flex-col justify-between rounded-[14px] bg-dark-1 px-5 py-8 xl:max-w-[568px]">
       <article className="flex flex-col gap-5">
@@ -138,9 +168,11 @@ const MeetingCard = ({
               />
               &nbsp; Copy Link
             </Button>
+            <Button onClick={() => getSummary(link)} >Get Summary</Button>
           </div>
         )}
       </article>
+       <SummaryPopover summaryText={summary} />
     </section>
   );
 };

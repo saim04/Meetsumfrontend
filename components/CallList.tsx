@@ -8,7 +8,12 @@ import MeetingCard from './MeetingCard';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
+interface CallListProps {
+  type: 'ended' | 'upcoming' | 'recordings'
+  setGPTLoader: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const CallList = ({ type, setGPTLoader }: CallListProps) => {
   const router = useRouter();
   const { endedCalls, upcomingCalls, callRecordings, isLoading } =
     useGetCalls();
@@ -125,6 +130,7 @@ const CallList = ({ type }: { type: 'ended' | 'upcoming' | 'recordings' }) => {
       {calls && calls.length > 0 ? (
         calls.map((meeting: Call | CallRecording) => (
           <MeetingCard
+            setGPTLoader ={setGPTLoader}
             key={(meeting as Call).id}
             icon={
               type === 'ended'
