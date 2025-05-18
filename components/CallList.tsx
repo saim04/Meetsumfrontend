@@ -9,8 +9,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface CallListProps {
-  type: 'ended' | 'upcoming' | 'recordings'
-  setGPTLoader: React.Dispatch<React.SetStateAction<boolean>>
+  type: 'ended' | 'upcoming' | 'recordings';
+  setGPTLoader: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CallList = ({ type, setGPTLoader }: CallListProps) => {
@@ -45,11 +45,11 @@ const CallList = ({ type, setGPTLoader }: CallListProps) => {
   };
 
   const getCreator = (meeting: any) => {
-    if (type === 'ended' || type === "upcoming") {
+    if (type === 'ended' || type === 'upcoming') {
       const creator = (meeting as Call).state?.createdBy;
-      return creator
+      return creator;
     }
-  }
+  };
 
   const calculateDuration = (meeting: Call) => {
     if (type === 'ended') {
@@ -77,7 +77,7 @@ const CallList = ({ type, setGPTLoader }: CallListProps) => {
   };
 
   const calculateDurationOfRecording = (meeting: CallRecording) => {
-    if (type === "recordings") {
+    if (type === 'recordings') {
       const startsAt = new Date((meeting as CallRecording).start_time);
       const endsAt = new Date((meeting as CallRecording).end_time);
 
@@ -97,16 +97,15 @@ const CallList = ({ type, setGPTLoader }: CallListProps) => {
       }
     }
 
-    return "";
+    return '';
   };
-
-
 
   useEffect(() => {
     const fetchRecordings = async () => {
       const callData = await Promise.all(
         callRecordings?.map((meeting) => meeting.queryRecordings()) ?? [],
       );
+      console.log('CALLDATA', callData);
 
       const recordings = callData
         .filter((call) => call.recordings.length > 0)
@@ -128,10 +127,10 @@ const CallList = ({ type, setGPTLoader }: CallListProps) => {
   return (
     <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
       {calls && calls.length > 0 ? (
-        calls.map((meeting: Call | CallRecording) => (
+        calls.map((meeting: Call | CallRecording, index) => (
           <MeetingCard
-            setGPTLoader ={setGPTLoader}
-            key={(meeting as Call).id}
+            setGPTLoader={setGPTLoader}
+            key={index}
             icon={
               type === 'ended'
                 ? '/icons/previous.svg'
@@ -165,7 +164,9 @@ const CallList = ({ type, setGPTLoader }: CallListProps) => {
             }
             duration={calculateDuration(meeting as Call)}
             creator={getCreator(meeting as Call)}
-            durationRecording={calculateDurationOfRecording(meeting as CallRecording)}
+            durationRecording={calculateDurationOfRecording(
+              meeting as CallRecording,
+            )}
           />
         ))
       ) : (
