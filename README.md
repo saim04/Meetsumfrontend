@@ -36,7 +36,7 @@
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/MuhammadAli7896/Convo-Meet.git
+   git clone https://github.com/saim04/Meetsumfrontend
    cd convo-meet
    ```
 
